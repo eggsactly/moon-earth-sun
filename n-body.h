@@ -1,5 +1,5 @@
 /*	
- *	Copyright (c) 2014 Garrett Weaver
+ *	Copyright (c) 2014 - 2016 Garrett Weaver
  *
  *	n-body is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -56,14 +56,14 @@ typedef struct _POLY_MESH {
 	THREE_VECTOR_UINT * face;	/*Pointer to a list of faces making up the shape, each index shall contain a vector of points, each point shall be identified by its index in the point list of this struct*/
 } POLY_MESH;
 
-/**	POINT. 
- *	The POINT structure defines the properties of a point particle, every physical object is based on a point. 
+/**	PARTICLE.
+ *	The PARTICLE structure defines the properties of a point particle, every physical object is based on a particle.
  */
-typedef struct _POINT {
+typedef struct _PARTICLE {
 	THREE_VECTOR_FLOAT position;	/*Position of point in 3-space in meters */
 	THREE_VECTOR_FLOAT speed; 	/*Speed of point in 3-space in meters/Second */
 	FloatingType mass; 		/*Mass of point in kilograms */
-} POINT; 
+} PARTICLE;
 
 /**	BODY.
  *	The BODY struct is based on the POINT structure and adds attributes for dimension, such as a shape and angular position and velocity. 
@@ -73,7 +73,7 @@ typedef struct _BODY {
 	THREE_VECTOR_FLOAT angularVelocity;	/*The angular velocity of the object */
 	THREE_VECTOR_FLOAT momentOfInertia;	/*The moment of inertia of the object */
 	POLY_MESH shape; 			/*The poly-mesh describing the object */ 
-	POINT pointAttributes; 			/*The position, velocity and mass of the object */
+	PARTICLE pointAttributes; 			/*The position, velocity and mass of the object */
 } BODY; 
 
 typedef enum NBodyError {
@@ -101,14 +101,14 @@ const char * ErrorParser(NBodyError errorCode);
  *	@param	timeStep The time amount of time, in seconds, overwhich the calculation will occur .
  *	@return An error code indicating how the function operated.
  */
-NBodyError CalculateNewPositionAndVelocity(POINT * output, POINT * pointList,  UnsignedType elements, UnsignedType pointOfInterest, FloatingType timeStep);
+NBodyError CalculateNewPositionAndVelocity(PARTICLE * output, PARTICLE * pointList,  UnsignedType elements, UnsignedType pointOfInterest, FloatingType timeStep);
 
 /**
  *	calculateNewPositionAndVelocity calculates the change in position and velocity on a point particle based on all the other particles in the system.
- *	@param	input The point you want to look at.
+ *	@param	input The particle you want to look at.
  *	@return A character array putting the point into a human readable form.
  */
-const char * PointToString(POINT * input);
+const char * PointToString(PARTICLE * input);
 
 #endif //N_BODY_H
 

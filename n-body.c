@@ -1,5 +1,5 @@
 /*	
- *	Copyright (c) 2014 Garrett Weaver
+ *	Copyright (c) 2014 - 2016 Garrett Weaver
  *
  *	n-body is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 #include "n-body.h"
 
-NBodyError CalculateNewPositionAndVelocity(POINT * output, POINT * pointList, UnsignedType elements, UnsignedType pointOfInterest, FloatingType timeStep) {
+NBodyError CalculateNewPositionAndVelocity(PARTICLE * output, PARTICLE * pointList, UnsignedType elements, UnsignedType pointOfInterest, FloatingType timeStep) {
 	
 	THREE_VECTOR_FLOAT distanceComponent;
 	FloatingType distance, acceleration;
@@ -62,12 +62,12 @@ NBodyError CalculateNewPositionAndVelocity(POINT * output, POINT * pointList, Un
 	return SUCCESS; 
 }
 
-NBodyError Simulate(POINT * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample) {
+NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample) {
 	UnsignedType step; 
 	UnsignedType i;
-	POINT * nextStep = NULL; 
+	PARTICLE * nextStep = NULL;
 	NBodyError error = SUCCESS;
-	nextStep = (POINT *) malloc(elements * sizeof(POINT));
+	nextStep = (PARTICLE *) malloc(elements * sizeof(PARTICLE));
 	if(pointList == NULL) {
 		return POINTLIST_NULL; 
 	}
@@ -118,7 +118,7 @@ const char * errorParser(NBodyError errorCode) {
 	}
 }
 
-const char * PointToString(POINT * input) {
+const char * PointToString(PARTICLE * input) {
 	printf("position.x: %f, position.y: %f, position.z: %f, speed.x: %f, speed.y %f, speed.z: %f, mass: %f\n", input->position.x, input->position.y, input->position.z, input->speed.x, input->speed.y, input->speed.z, input->mass); 
 	return "";
 }
@@ -130,8 +130,8 @@ int main()
 	NBodyError error = SUCCESS;
 	unsigned int stepsPerSample = 3600;
 
-	POINT solarSystem[3];
-	POINT earth, moon, sun;
+	PARTICLE solarSystem[3];
+	PARTICLE earth, moon, sun;
 	FILE *fp;	 
 		
 	//Set up the array to record locations of the earth and the moon
@@ -169,7 +169,7 @@ int main()
 	solarSystem[1] = moon;
 	solarSystem[2] = sun;
  
-	error = Simulate(solarSystem, sizeof(solarSystem) / sizeof(POINT), numSeconds, 1.0, recordArray, stepsPerSample);
+	error = Simulate(solarSystem, sizeof(solarSystem) / sizeof(PARTICLE), numSeconds, 1.0, recordArray, stepsPerSample);
 	if(error != SUCCESS) {
 		printf("ERROR: %s.\n", errorParser(error));
 	}
