@@ -176,6 +176,8 @@ int main()
 
 	fp = fopen("record.txt", "w+");
 
+    fprintf(fp, "# Time\tMoon-x\tMoon-y\tEarth-x\tEarth-y\n");
+    
 	for(i = 0; i < numSeconds/stepsPerSample; i++) {
 		fprintf(fp, "%f\t%f\t%f\t%f\t%f\n", recordArray[i][0], recordArray[i][1], recordArray[i][2], recordArray[i][3], recordArray[i][4]); 
 	}
