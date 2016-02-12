@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-c -Wall
-IFLAGS=-I. -I/usr/include 
-LFLAGS=-L/usr/lib -lm  
+IFLAGS=-I.
+LFLAGS=
 
 SOURCES=n-body.c
 OBJECTS=n-body.o

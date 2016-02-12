@@ -15,10 +15,12 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
-#include <stdlib.h> 
-
+#include <string.h>
 #include "n-body.h"
 
 NBodyError CalculateNewPositionAndVelocity(PARTICLE * output, PARTICLE * pointList, UnsignedType elements, UnsignedType pointOfInterest, FloatingType timeStep) {
@@ -123,13 +125,43 @@ const char * PointToString(PARTICLE * input) {
 	return "";
 }
 
-int main()
+unsigned ProcessFlags(int argc, char **argv, char ** inputFile) {
+    int index, c;
+    while ((c = getopt (argc, argv, "o:")) != -1){
+        switch (c)
+        {
+            case 'o': // input file flag
+                *inputFile = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
+                strcpy(*inputFile, optarg);
+                break;
+            case '?':
+                if (optopt == 'o')
+                    fprintf (stderr, "Option -%o requires an argument.\n", optopt);
+                else if (isprint (optopt))
+                    fprintf (stderr, "Unknown option `-%o'.\n", optopt);
+                else
+                    fprintf (stderr,"Unknown option character `\\x%x'.\n", optopt);
+                return 1;
+            default:
+                abort ();
+        }
+    
+        for (index = optind; index < argc; index++)
+            printf ("Non-option argument %s\n", argv[index]);
+        return 0;
+    }
+    
+    return 0;
+}
+
+int main(int argc, char **argv)
 {
 	const unsigned long long numSeconds = 31536000;
 	unsigned long long i; 
 	NBodyError error = SUCCESS;
 	unsigned int stepsPerSample = 3600;
-
+    char * inputFile = NULL;
+    
 	PARTICLE solarSystem[3];
 	PARTICLE earth, moon, sun;
 	FILE *fp;	 
@@ -169,12 +201,15 @@ int main()
 	solarSystem[1] = moon;
 	solarSystem[2] = sun;
  
+    // Process the input flags before running the simulation
+    ProcessFlags(argc, argv, &inputFile);
+    
 	error = Simulate(solarSystem, sizeof(solarSystem) / sizeof(PARTICLE), numSeconds, 1.0, recordArray, stepsPerSample);
 	if(error != SUCCESS) {
 		printf("ERROR: %s.\n", errorParser(error));
 	}
 
-	fp = fopen("record.txt", "w+");
+	fp = fopen(inputFile, "w+");
 
     fprintf(fp, "# Time\tMoon-x\tMoon-y\tEarth-x\tEarth-y\n");
     
@@ -187,7 +222,8 @@ int main()
 	for(i = 0; i < numSeconds/stepsPerSample; i++) {
 		free(recordArray[i]); 
 	}
-	free(recordArray); 
+	free(recordArray);
+    free(inputFile);
 
 	return 0; 
 }
