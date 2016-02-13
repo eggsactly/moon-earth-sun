@@ -118,6 +118,8 @@ const char * ErrorParser(NBodyError errorCode) {
 }
 
 const char * PointToString(PARTICLE * input) {
-	printf("position.x: %f, position.y: %f, position.z: %f, speed.x: %f, speed.y %f, speed.z: %f, mass: %f\n", input->position.x, input->position.y, input->position.z, input->speed.x, input->speed.y, input->speed.z, input->mass); 
-	return "";
+    const size_t retStrLen = 1024;
+    char * outputVal = (char *) malloc(sizeof(char) * retStrLen);
+	snprintf(outputVal, retStrLen, "position.x: %f, position.y: %f, position.z: %f, speed.x: %f, speed.y %f, speed.z: %f, mass: %f\n", input->position.x, input->position.y, input->position.z, input->speed.x, input->speed.y, input->speed.z, input->mass);
+	return outputVal;
 }
