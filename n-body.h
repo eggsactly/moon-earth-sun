@@ -21,11 +21,11 @@
 typedef double FloatingType; 
 typedef unsigned long UnsignedType;
 
-const unsigned int x = 0;
-const unsigned int y = 1;
-const unsigned int z = 2;
+static const unsigned int x = 0;
+static const unsigned int y = 1;
+static const unsigned int z = 2;
 
-const FloatingType G = 6.673e-11;
+static const FloatingType G = 6.673e-11;
 
 /**	THREE_VECTOR_FLOAT. 
  *	The THREE_VECTOR_FLOAT struct is a container for three congruent variables in floating point.  
@@ -109,6 +109,8 @@ NBodyError CalculateNewPositionAndVelocity(PARTICLE * output, PARTICLE * pointLi
  *	@return A character array putting the point into a human readable form.
  */
 const char * PointToString(PARTICLE * input);
+
+NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample);
 
 #endif //N_BODY_H
 

@@ -3,10 +3,10 @@ CFLAGS=-c -Wall
 IFLAGS=-I.
 LFLAGS=
 
-SOURCES=n-body.c
-OBJECTS=n-body.o
+SOURCES=moon-earth-sun.c n-body.c
+OBJECTS=moon-earth-sun.o n-body.o
 HEADERS=n-body.h
-EXECUTABLE=n-body
+EXECUTABLE=moon-earth-sun
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) -o $(EXECUTABLE) $(OBJECTS) $(IFLAGS) $(LFLAGS)

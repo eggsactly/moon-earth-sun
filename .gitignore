@@ -1,4 +1,4 @@
 .DS_Store
 *.o
-n-body
-record.txt
+moon-earth-sun
+*.txt
