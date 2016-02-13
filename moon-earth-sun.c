@@ -22,6 +22,39 @@
 #include <string.h>
 #include "n-body.h"
 
+NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample) {
+    UnsignedType step;
+    UnsignedType i;
+    PARTICLE * nextStep = NULL;
+    NBodyError error = SUCCESS;
+    nextStep = (PARTICLE *) malloc(elements * sizeof(PARTICLE));
+    if(pointList == NULL) {
+        return POINTLIST_NULL;
+    }
+    
+    for(step = 0; step < numSteps; step++) {
+        for(i = 0; (i < elements) && (error == SUCCESS); i++) {
+            error = CalculateNewPositionAndVelocity(nextStep + i, pointList, elements, i, timeStep);
+        }
+        
+        if((step % stepsPerSample) == 0){
+            record[step/stepsPerSample][0] = step * timeStep;
+            record[step/stepsPerSample][1] = pointList[1].position.x;
+            record[step/stepsPerSample][2] = pointList[1].position.y;
+            record[step/stepsPerSample][3] = pointList[0].position.x;
+            record[step/stepsPerSample][4] = pointList[0].position.y;
+        }
+        for(i = 0; (i < elements) && (error == SUCCESS); i++) {
+            pointList[i] = nextStep[i]; 
+        }
+    }
+    
+    free(nextStep); 
+    nextStep = NULL; 
+    
+    return error; 
+}
+
 unsigned ProcessFlags(int argc, char **argv, char ** inputFile) {
     int index, c;
     while ((c = getopt (argc, argv, "o:")) != -1){

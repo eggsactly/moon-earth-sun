@@ -110,7 +110,5 @@ NBodyError CalculateNewPositionAndVelocity(PARTICLE * output, PARTICLE * pointLi
  */
 const char * PointToString(PARTICLE * input);
 
-NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample);
-
 #endif //N_BODY_H
 
