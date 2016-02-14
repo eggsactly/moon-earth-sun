@@ -22,6 +22,7 @@
 #include <string.h>
 #include "n-body.h"
 
+
 NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample) {
     UnsignedType step;
     UnsignedType i;
@@ -55,33 +56,46 @@ NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType nu
     return error; 
 }
 
-unsigned ProcessFlags(int argc, char **argv, char ** inputFile) {
+/**	FLAGS_USED.
+ *	The FLAGS_USED struct contains booleans indicating if a flag used in the program is being used
+ */
+typedef struct _FLAGS_USED {
+    unsigned char unknownOption;
+    unsigned char outputFile;
+} FLAGS_USED;
+
+FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile) {
     int index, c;
+    FLAGS_USED flagsUsed;
+    flagsUsed.outputFile = 0;
+    flagsUsed.unknownOption = 0;
+    
     while ((c = getopt (argc, argv, "o:")) != -1){
         switch (c)
         {
             case 'o': // input file flag
-                *inputFile = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
-                strcpy(*inputFile, optarg);
+                *outputFile = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
+                strcpy(*outputFile, optarg);
                 break;
             case '?':
+                flagsUsed.unknownOption = 1;
                 if (optopt == 'o')
                     fprintf (stderr, "Option -%o requires an argument.\n", optopt);
                 else if (isprint (optopt))
                     fprintf (stderr, "Unknown option `-%o'.\n", optopt);
                 else
                     fprintf (stderr,"Unknown option character `\\x%x'.\n", optopt);
-                return 1;
+                return flagsUsed;
             default:
-                abort ();
+                abort();
+                
         }
         
         for (index = optind; index < argc; index++)
             printf ("Non-option argument %s\n", argv[index]);
-        return 0;
     }
     
-    return 0;
+    return flagsUsed;
 }
 
 int main(int argc, char **argv)
@@ -90,11 +104,29 @@ int main(int argc, char **argv)
     unsigned long long i;
     NBodyError error = SUCCESS;
     unsigned int stepsPerSample = 3600;
-    char * inputFile = NULL;
+    FloatingType stepSize = 1.0;
+    char * outputFile = NULL;
+    FLAGS_USED flagsUsed;
     
     PARTICLE solarSystem[3];
     PARTICLE earth, moon, sun;
     FILE *fp;
+    
+    const char * defaultOutputFileName = "output.dat";
+    
+    // Process the input flags before running the simulation
+    flagsUsed = ProcessFlags(argc, argv, &outputFile);
+    
+    // Specify default values for all flags not specified
+    // Unknown option used
+    if(flagsUsed.unknownOption) {
+        return 0;
+    }
+    // -o flag
+    if(!flagsUsed.outputFile) {
+        outputFile = (char *) malloc((strlen(defaultOutputFileName) + 1) * sizeof(char));
+        strcpy(outputFile, defaultOutputFileName);
+    }
     
     //Set up the array to record locations of the earth and the moon
     FloatingType ** recordArray;
@@ -131,29 +163,29 @@ int main(int argc, char **argv)
     solarSystem[1] = moon;
     solarSystem[2] = sun;
     
-    // Process the input flags before running the simulation
-    ProcessFlags(argc, argv, &inputFile);
-    
-    error = Simulate(solarSystem, sizeof(solarSystem) / sizeof(PARTICLE), numSeconds, 1.0, recordArray, stepsPerSample);
+    // Run the simulation, putting results into RAM
+    error = Simulate(solarSystem, sizeof(solarSystem) / sizeof(PARTICLE), numSeconds, stepSize, recordArray, stepsPerSample);
     if(error != SUCCESS) {
         printf("ERROR: %s.\n", ErrorParser(error));
     }
     
-    fp = fopen(inputFile, "w+");
+    // Open the output file
+    fp = fopen(outputFile, "w+");
     
+    // Write the solar system results from RAM to Disk
     fprintf(fp, "# Time\tMoon-x\tMoon-y\tEarth-x\tEarth-y\n");
-    
     for(i = 0; i < numSeconds/stepsPerSample; i++) {
         fprintf(fp, "%f\t%f\t%f\t%f\t%f\n", recordArray[i][0], recordArray[i][1], recordArray[i][2], recordArray[i][3], recordArray[i][4]);
     }
-    
+    // Close the file
     fclose(fp);
     
+    // Deallocated contents of RAM
     for(i = 0; i < numSeconds/stepsPerSample; i++) {
         free(recordArray[i]); 
     }
     free(recordArray);
-    free(inputFile);
+    free(outputFile);
     
     return 0; 
 }
