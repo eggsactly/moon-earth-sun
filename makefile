@@ -9,10 +9,10 @@ HEADERS=n-body.h
 EXECUTABLE=moon-earth-sun
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) -o $(EXECUTABLE) $(OBJECTS) $(IFLAGS) $(LFLAGS)
+	$(CC) -g -o $(EXECUTABLE) $(OBJECTS) $(IFLAGS) $(LFLAGS)
 
 %.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -o $@ $< $(IFLAGS) $(LFLAGS)
+	$(CC) -g $(CFLAGS) -o $@ $< $(IFLAGS) $(LFLAGS)
 
 clean:
 	rm -rf *o $(EXECUTABLE)  

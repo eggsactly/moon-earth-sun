@@ -60,26 +60,56 @@ NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType nu
  *	The FLAGS_USED struct contains booleans indicating if a flag used in the program is being used
  */
 typedef struct _FLAGS_USED {
+    unsigned char inputNull;
     unsigned char unknownOption;
+    unsigned char conversionFailure;
     unsigned char outputFile;
+    unsigned char simulationStepSize;
+    unsigned char simlulationTime;
+    unsigned char stepsPerSample;
 } FLAGS_USED;
 
-FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile) {
+FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile, FloatingType * stepSize, unsigned long long * numSeconds, unsigned int * stepsPerSample) {
     int index, c;
     FLAGS_USED flagsUsed;
-    flagsUsed.outputFile = 0;
+    flagsUsed.inputNull = 0;
     flagsUsed.unknownOption = 0;
+    flagsUsed.conversionFailure = 0;
+    flagsUsed.outputFile = 0;
+    flagsUsed.simulationStepSize = 0;
+    flagsUsed.simlulationTime = 0;
+    flagsUsed.stepsPerSample = 0;
     
-    while ((c = getopt (argc, argv, "o:")) != -1){
+    if((stepSize == NULL) || (numSeconds == NULL) || (stepsPerSample == NULL)){
+        flagsUsed.inputNull = 1;
+        return flagsUsed;
+    }
+    
+    while ((c = getopt (argc, argv, "ostm:")) != -1){
         switch (c)
         {
             case 'o': // input file flag
                 *outputFile = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
                 strcpy(*outputFile, optarg);
                 break;
+            case 's':
+                *stepSize = (FloatingType) atof(optarg);
+                if(*stepSize <= 0.0) {
+                    flagsUsed.conversionFailure = 1;
+                }
+            case 't':
+                *numSeconds = atoll(optarg);
+                if(*numSeconds <= 0){
+                    flagsUsed.conversionFailure = 1;
+                }
+            case 'm':
+                *stepsPerSample = atoi(optarg);
+                if(*stepsPerSample <= 0){
+                    flagsUsed.conversionFailure = 1;
+                }
             case '?':
                 flagsUsed.unknownOption = 1;
-                if (optopt == 'o')
+                if ((optopt == 'o') || (optopt == 's') || (optopt == 't') || (optopt == 'm'))
                     fprintf (stderr, "Option -%o requires an argument.\n", optopt);
                 else if (isprint (optopt))
                     fprintf (stderr, "Unknown option `-%o'.\n", optopt);
@@ -94,38 +124,64 @@ FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile) {
         for (index = optind; index < argc; index++)
             printf ("Non-option argument %s\n", argv[index]);
     }
-    
     return flagsUsed;
 }
 
 int main(int argc, char **argv)
 {
-    const unsigned long long numSeconds = 31536000;
     unsigned long long i;
     NBodyError error = SUCCESS;
-    unsigned int stepsPerSample = 3600;
-    FloatingType stepSize = 1.0;
-    char * outputFile = NULL;
     FLAGS_USED flagsUsed;
+    const char defaultOutputFileName[] = "output.dat";
+    
+    const FloatingType defaultStepSize = 1.0;
+    const unsigned long long defaultNumSeconds = 31536000;
+    const unsigned int defaultStepsPerSample = 3600 * 24;
+    
+    char * outputFile = NULL;
+    FloatingType stepSize;
+    unsigned long long numSeconds;
+    unsigned int stepsPerSample;
     
     PARTICLE solarSystem[3];
     PARTICLE earth, moon, sun;
     FILE *fp;
     
-    const char * defaultOutputFileName = "output.dat";
-    
     // Process the input flags before running the simulation
-    flagsUsed = ProcessFlags(argc, argv, &outputFile);
+    flagsUsed = ProcessFlags(argc, argv, &outputFile, &stepSize, &numSeconds, &stepsPerSample);
+    
+    return 0;
     
     // Specify default values for all flags not specified
     // Unknown option used
     if(flagsUsed.unknownOption) {
         return 0;
     }
+    // If one of the non-pointer variables passed in were null
+    if(flagsUsed.inputNull) {
+        printf("Input to option parser NULL.\n");
+        return 0;
+    }
+    if(flagsUsed.conversionFailure) {
+        printf("Failed trying to convert an input value.\n");
+        return 0;
+    }
     // -o flag
     if(!flagsUsed.outputFile) {
         outputFile = (char *) malloc((strlen(defaultOutputFileName) + 1) * sizeof(char));
         strcpy(outputFile, defaultOutputFileName);
+    }
+    // -s flag
+    if(!flagsUsed.simulationStepSize) {
+        stepSize = defaultStepSize;
+    }
+    // -t flag
+    if(!flagsUsed.simlulationTime){
+        numSeconds = defaultNumSeconds;
+    }
+    // -m flag
+    if(!flagsUsed.stepsPerSample){
+        stepsPerSample = defaultStepsPerSample;
     }
     
     //Set up the array to record locations of the earth and the moon
@@ -135,6 +191,7 @@ int main(int argc, char **argv)
         recordArray[i] = (FloatingType *) malloc(sizeof(FloatingType) * 5);
     }
     
+    // Set intial velocity and positions of the earth, sun and moon
     earth.position.x = 0;
     earth.position.y = 1.5210e11;
     earth.position.z = 0;
@@ -169,7 +226,7 @@ int main(int argc, char **argv)
         printf("ERROR: %s.\n", ErrorParser(error));
     }
     
-    // Open the output file
+    // Open the output file for writing
     fp = fopen(outputFile, "w+");
     
     // Write the solar system results from RAM to Disk
