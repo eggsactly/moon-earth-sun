@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-c -Wall
 IFLAGS=-I.
-LFLAGS=
+LFLAGS=-lm
 
 SOURCES=moon-earth-sun.c n-body.c
 OBJECTS=moon-earth-sun.o n-body.o

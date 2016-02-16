@@ -23,6 +23,16 @@
 #include "n-body.h"
 
 
+/**
+ *	Simulate takes a step in time of an n-body system and calculates new possitions and velocities for all objects in the system
+ *	@param	pointList an array of points in the n-body system
+ *  @param  elements size of the pointList array
+ *  @param  numSteps the number of steps the simulation shall take before completing
+ *  @param  timeStep the size of time step
+ *  @param  record an array which all positions of all bodies are recorded into
+ *  @param  stepsPerSample the number of steps the simulation takes before recording particle possitions into the record array
+ *	@return	an NBodyError if anything went wrong
+ */
 NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample) {
     UnsignedType step;
     UnsignedType i;
@@ -70,7 +80,7 @@ typedef struct _FLAGS_USED {
 } FLAGS_USED;
 
 FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile, FloatingType * stepSize, unsigned long long * numSeconds, unsigned int * stepsPerSample) {
-    int index, c;
+    int c;
     FLAGS_USED flagsUsed;
     flagsUsed.inputNull = 0;
     flagsUsed.unknownOption = 0;
@@ -85,28 +95,39 @@ FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile, FloatingType 
         return flagsUsed;
     }
     
-    while ((c = getopt (argc, argv, "ostm:")) != -1){
+    while ((c = getopt (argc, argv, "o:s:t:m:")) != -1){
         switch (c)
         {
             case 'o': // input file flag
                 *outputFile = (char *) malloc((strlen(optarg) + 1) * sizeof(char));
                 strcpy(*outputFile, optarg);
+                flagsUsed.outputFile = 1;
                 break;
             case 's':
                 *stepSize = (FloatingType) atof(optarg);
                 if(*stepSize <= 0.0) {
                     flagsUsed.conversionFailure = 1;
                 }
+                flagsUsed.simulationStepSize = 1;
+                break;
             case 't':
                 *numSeconds = atoll(optarg);
                 if(*numSeconds <= 0){
                     flagsUsed.conversionFailure = 1;
                 }
+                flagsUsed.simlulationTime = 1;
+                break;
             case 'm':
                 *stepsPerSample = atoi(optarg);
                 if(*stepsPerSample <= 0){
                     flagsUsed.conversionFailure = 1;
                 }
+                flagsUsed.stepsPerSample = 1;
+                break;
+            case ':':
+                fprintf(stderr, "Option -%c requires and operand\n", optopt);
+                flagsUsed.unknownOption = 1;
+                break;
             case '?':
                 flagsUsed.unknownOption = 1;
                 if ((optopt == 'o') || (optopt == 's') || (optopt == 't') || (optopt == 'm'))
@@ -116,13 +137,12 @@ FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile, FloatingType 
                 else
                     fprintf (stderr,"Unknown option character `\\x%x'.\n", optopt);
                 return flagsUsed;
+                break;
             default:
                 abort();
+                break;
                 
         }
-        
-        for (index = optind; index < argc; index++)
-            printf ("Non-option argument %s\n", argv[index]);
     }
     return flagsUsed;
 }
@@ -136,12 +156,12 @@ int main(int argc, char **argv)
     
     const FloatingType defaultStepSize = 1.0;
     const unsigned long long defaultNumSeconds = 31536000;
-    const unsigned int defaultStepsPerSample = 3600 * 24;
+    const unsigned int defaultStepsPerSample = 3600;
     
     char * outputFile = NULL;
-    FloatingType stepSize;
-    unsigned long long numSeconds;
-    unsigned int stepsPerSample;
+    FloatingType stepSize = 1.0;
+    unsigned long long numSeconds = 1;
+    unsigned int stepsPerSample = 1;
     
     PARTICLE solarSystem[3];
     PARTICLE earth, moon, sun;
@@ -149,8 +169,6 @@ int main(int argc, char **argv)
     
     // Process the input flags before running the simulation
     flagsUsed = ProcessFlags(argc, argv, &outputFile, &stepSize, &numSeconds, &stepsPerSample);
-    
-    return 0;
     
     // Specify default values for all flags not specified
     // Unknown option used
@@ -164,6 +182,10 @@ int main(int argc, char **argv)
     }
     if(flagsUsed.conversionFailure) {
         printf("Failed trying to convert an input value.\n");
+        return 0;
+    }
+    if(flagsUsed.unknownOption) {
+        printf("Invalid input.\n");
         return 0;
     }
     // -o flag
@@ -183,6 +205,8 @@ int main(int argc, char **argv)
     if(!flagsUsed.stepsPerSample){
         stepsPerSample = defaultStepsPerSample;
     }
+    
+    return 0;
     
     //Set up the array to record locations of the earth and the moon
     FloatingType ** recordArray;
