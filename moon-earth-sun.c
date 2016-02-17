@@ -206,8 +206,6 @@ int main(int argc, char **argv)
         stepsPerSample = defaultStepsPerSample;
     }
     
-    return 0;
-    
     //Set up the array to record locations of the earth and the moon
     FloatingType ** recordArray;
     recordArray = (FloatingType **) malloc(sizeof(FloatingType *) * numSeconds);
