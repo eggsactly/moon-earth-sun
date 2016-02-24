@@ -5,7 +5,14 @@ LFLAGS=-lm
 
 EXECUTABLE=moon-earth-sun
 
-moon-earth-sun.svg: output.txt
+paper.pdf: paper.tex
+	pdflatex paper.tex
+	pdflatex paper.tex
+
+paper.tex: moon-earth-sun.tex
+	python generate-latex.py
+
+moon-earth-sun.tex: output.txt
 	gnuplot plot.p
 
 output.txt: $(EXECUTABLE)
@@ -22,5 +29,5 @@ n-body.o: n-body.c n-body.h
 	$(CC) $(CFLAGS) -o n-body.o n-body.c $(IFLAGS) $(LFLAGS)
 
 clean:
-	rm -rf *o $(EXECUTABLE) output.txt *.svg *.pdf
+	rm -rf *o $(EXECUTABLE) output.txt *.pdf *.eps *.aux *.log *.tex *.gz
 

@@ -5,3 +5,8 @@ moon-earth-sun
 *.dat
 *.svg
 *.pdf
+*.aux
+*.log
+*.tex
+*.eps
+*.gz
