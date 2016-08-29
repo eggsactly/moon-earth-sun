@@ -4,8 +4,8 @@ moon-earth-sun is an example LaTeX project that produces a quasi-scientific pape
 # Contents
 This project consists of:
 - A makefile, which compiles all the sources to produce paper.pdf, the final product
-- Some C source code, which contains the model of the Moon, Earth Sun system
-- A gnuplot script `plot.p' which generates the plot of the Earth and Moon's path
+- Some C source code, which contains the model of the Moon, Earth, Sun system
+- A gnuplot script _plot.p_ which generates the plot of the Earth and Moon's path
 - A python script, which generates the paper.tex source code used to create the paper.pdf file
 
 # Dependencies 
@@ -16,15 +16,16 @@ moon-earth-sun requires the following software to be installed for the build pro
 - gnuplot
 
 # Building
-To create paper.pdf type `make' and press ENTER.
-You'll notice that a lot of extra files are produced, to delete everything that was generated from the make script run `make clean'
+To create paper.pdf type _make_ and press ENTER.
+You'll notice that a lot of extra files are produced, to delete everything that was generated from the make script run _make clean_
 
-This project may be updated, to check for new updates, run `git pull'
+This project may be updated, to check for new updates, run _git pull_
 
 # Support
 This software has been tested to work on:
 - Debian “Jessie” 8.5
 - Mac OS X “El Capitan” 10.11.6
+
 Although this software should compile on other operating systems without editing any files in this project, no guarantee will be made. 
 
 # License
