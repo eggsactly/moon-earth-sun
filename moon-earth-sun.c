@@ -1,5 +1,7 @@
 /*
- *	Copyright (c) 2016 Garrett Weaver
+ *	Copyright (c) 2016 W.A. Garrett Weaver
+ *
+ *	This file is part of moon-earth-sun.
  *
  *	moon-earth-sun is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -12,7 +14,7 @@
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with moon-earth-sun.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <ctype.h>
@@ -79,6 +81,16 @@ typedef struct _FLAGS_USED {
     unsigned char stepsPerSample;
 } FLAGS_USED;
 
+
+/**
+ *	ProcessFlags parses the command line arguments from the user and translates the flags into switches for the program
+ *	@param	argc an int containing the number of spaces in the input
+ *  @param  argv an array of array of characters of the input
+ *  @param  outputFile a pointer to a character array, which will be allocated in this function containing the name of a file to output position data to
+ *  @param  stepSize a floating point number indicating how large each step in the simulation shall be in seconds
+ *  @param  numSeconds an unsigned long long integer for the duration of the simulation in seconds
+ *	@return	a struct containg all flags available to the program
+ */
 FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile, FloatingType * stepSize, unsigned long long * numSeconds, unsigned int * stepsPerSample) {
     int c;
     FLAGS_USED flagsUsed;
