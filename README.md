@@ -12,6 +12,7 @@ This project consists of:
 moon-earth-sun requires the following software to be installed for the build process to complete
 - make
 - gcc
+- python
 - latex
 - gnuplot
 
