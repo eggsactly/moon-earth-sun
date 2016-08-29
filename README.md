@@ -8,9 +8,16 @@ This project consists of:
 - A gnuplot script `plot.p' which generates the plot of the Earth and Moon's path
 - A python script, which generates the paper.tex source code used to create the paper.pdf file
 
+# Dependencies 
+moon-earth-sun requires the following software to be installed for the build process to complete
+- make
+- gcc
+- latex
+- gnuplot
+
 # Building
 To create paper.pdf type `make' and press ENTER.
-You'll notice a lot of extra files are produced, to delete everything that was generated from the make script run `make clean'
+You'll notice that a lot of extra files are produced, to delete everything that was generated from the make script run `make clean'
 
 This project may be updated, to check for new updates, run `git pull'
 
@@ -18,6 +25,7 @@ This project may be updated, to check for new updates, run `git pull'
 This software has been tested to work on:
 - Debian “Jessie” 8.5
 - Mac OS X “El Capitan” 10.11.6
+Although this software should compile on other operating systems without editing any files in this project, no guarantee will be made. 
 
 # License
 moon-earth-sun is free software: you can redistribute it and/or modify
