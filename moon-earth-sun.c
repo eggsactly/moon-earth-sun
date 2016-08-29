@@ -28,11 +28,11 @@
 /**
  *	Simulate takes a step in time of an n-body system and calculates new possitions and velocities for all objects in the system
  *	@param	pointList an array of points in the n-body system
- *  @param  elements size of the pointList array
- *  @param  numSteps the number of steps the simulation shall take before completing
- *  @param  timeStep the size of time step
- *  @param  record an array which all positions of all bodies are recorded into
- *  @param  stepsPerSample the number of steps the simulation takes before recording particle possitions into the record array
+ *	@param  elements size of the pointList array
+ *	@param  numSteps the number of steps the simulation shall take before completing
+ *	@param  timeStep the size of time step
+ *	@param  record an array which all positions of all bodies are recorded into
+ *	@param  stepsPerSample the number of steps the simulation takes before recording particle possitions into the record array
  *	@return	an NBodyError if anything went wrong
  */
 NBodyError Simulate(PARTICLE * pointList, UnsignedType elements, UnsignedType numSteps, FloatingType timeStep, FloatingType ** record, unsigned int stepsPerSample) {
@@ -85,10 +85,10 @@ typedef struct _FLAGS_USED {
 /**
  *	ProcessFlags parses the command line arguments from the user and translates the flags into switches for the program
  *	@param	argc an int containing the number of spaces in the input
- *  @param  argv an array of array of characters of the input
- *  @param  outputFile a pointer to a character array, which will be allocated in this function containing the name of a file to output position data to
- *  @param  stepSize a floating point number indicating how large each step in the simulation shall be in seconds
- *  @param  numSeconds an unsigned long long integer for the duration of the simulation in seconds
+ *	@param  argv an array of array of characters of the input
+ *	@param  outputFile a pointer to a character array, which will be allocated in this function containing the name of a file to output position data to
+ *	@param  stepSize a floating point number indicating how large each step in the simulation shall be in seconds
+ *	@param  numSeconds an unsigned long long integer for the duration of the simulation in seconds
  *	@return	a struct containg all flags available to the program
  */
 FLAGS_USED ProcessFlags(int argc, char **argv, char ** outputFile, FloatingType * stepSize, unsigned long long * numSeconds, unsigned int * stepsPerSample) {
